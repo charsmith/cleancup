@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en"
+    <head>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link href="css/datepicker.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+            <!-- Main hero unit for a primary marketing message or call to action -->
+            <div class="row well">
+                <div class="span4">
+                    <img src="img/hatter.jpg">
+                </div>
+                <div class="span7">
+                    <br/>
+                    <h2>Clean Cup - Take Two</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="span6">
+                    <form id="user-form" class="form-inline">
+                        <fieldset>
+                            <div class="control-group">
+                                <label>Username</label>
+                                <div class="controls">
+                                    <select id='username'>
+                                        <option>badweasel</option>
+                                        <option>Bagherra</option>
+                                        <option>Blott</option>
+                                        <option>boltongeordie</option>
+                                        <option>czrdup</option>
+                                        <option>DKahnt</option>
+                                        <option>Grimwold</option>
+                                        <option>Guantanamo</option>
+                                        <option>Isamoor</option>
+                                        <option>JohnBandettini</option>
+                                        <option>KSensei</option>
+                                        <option>KrisVerbeeck</option>
+                                        <option>Neil Thomson</option>
+                                        <option>Randy Cox</option>
+                                        <option>Rygel</option>
+                                        <option>Sagrilarus</option>
+                                        <option>SteveK2</option>
+                                        <option>stormseeker75</option>
+                                        <option>Teriyaki Donuts</option>
+                                        <option>Vanhel</option>
+                                        <option>manowarplayer</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label>Min date</label>
+                                <div class="controls">
+                                    <input type="text" id='mindate' class="datepicker">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label>Max date</label>
+                                <div class="controls">
+                                    <input type="text" id='maxdate' class="datepicker">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <button type="submit" class="btn">Search</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="span6">
+                    <textarea id="output" rows=15 class="span5">
+                    </textarea>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script id="user-tmpl" type="text/template">[user=<%=username%>][/user]
+
+Games Played from <%=mindate%> to <%=maxdate%>
+
+<% if (_.keys(plays).length) {
+    _.each(_.sortBy(_.keys(plays), function(id) {return -plays[id].quantity}), function(id) { 
+    %>x<%=plays[id].quantity%> [thing=<%=id%>][/thing]
+<%});} else {%>No games found!<%}%>
+    </script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-datepicker.js"></script>
+    <script src="js/lodash.min.js"></script>
+    <script src="js/moment.min.js"></script>
+    <script>
+        $(function() {
+            $('#mindate').val(moment().subtract('months', 1).format("YYYY-MM-DD"));
+            $('#maxdate').val(moment().format("YYYY-MM-DD"));
+            $('.datepicker').datepicker({
+                format: 'yyyy-mm-dd'
+            });
+            var lookup = function() {
+                
+            };
+            var userTmpl = _.template($('#user-tmpl').html());
+            $(document).on('submit', '#user-form', function() {
+                var username = $('#username').val();
+                var mindate = $('#mindate').val();
+                var maxdate = $('#maxdate').val();
+                $('.btn').button('loading');
+                $.ajax({
+                    url: ["/plays", username, mindate, maxdate].join('/'),
+                    dataType: 'json'
+                }).done(function(json) {
+                    $('.btn').button('reset');
+                    $('#output').val(userTmpl({
+                        username: username,
+                        maxdate: maxdate,
+                        mindate: mindate,
+                        plays: json
+                    })); 
+                }).fail(function() {
+                    $('.btn').button('reset');
+                    alert('failed to load data');
+                });
+                return false;
+            });
+        });
+    </script>
+</html>
