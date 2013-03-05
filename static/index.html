@@ -96,9 +96,6 @@ Games Played from <%=mindate%> to <%=maxdate%>
             $('.datepicker').datepicker({
                 format: 'yyyy-mm-dd'
             });
-            var lookup = function() {
-                
-            };
             var userTmpl = _.template($('#user-tmpl').html());
             $(document).on('submit', '#user-form', function() {
                 var username = $('#username').val();
