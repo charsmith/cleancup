@@ -4,6 +4,8 @@ import xmltodict
 class Plays(object):
     def __add_plays(self, plays, xml):
         if xml['plays'].has_key('play'):
+            if type(xml['plays']['play']) != list:
+                xml['plays']['play'] = (xml['plays']['play'],)
             for play in xml['plays']['play']:
                 oid = play['item']['@objectid']
                 if plays.has_key(oid):
@@ -23,6 +25,7 @@ class Plays(object):
                     "username={0}"
                     "&mindate={1}"
                     "&maxdate={2}"
+                    "&subtype=boardgame"
                     "&page={3}"
                     "&type=thing"
                     ).format(user, from_date, to_date, page+1)
